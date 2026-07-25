@@ -1,5 +1,35 @@
-const response = await fetch('/.netlify/functions/groq', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: question })
-});
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Tutor</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 50px; background: #f0f0f0; }
+    #box { width: 300px; padding: 10px; font-size: 16px; }
+    #btn { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    #answer { margin-top: 20px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>AI Tutor - Om ka Study Bot</h1>
+  <input type="text" id="box" placeholder="Sawal likho...">
+  <button id="btn" onclick="ask()">Answer Lein</button>
+  <div id="answer"></div>
+
+  <script>
+    async function ask() {
+      const question = document.getElementById('box').value;
+      document.getElementById('answer').innerText = "Soch raha hun...";
+      
+      const response = await fetch('/.netlify/functions/groq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: question })
+      });
+      
+      const data = await response.json();
+      document.getElementById('answer').innerText = data.answer;
+    }
+  </script>
+</body>
+</html>

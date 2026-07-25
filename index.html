@@ -5,35 +5,79 @@
 <style>
 body{font-family:sans-serif;background:#f0f2f5;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
 .box{background:white;padding:30px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);width:90%;max-width:500px;text-align:center}
-input{width:80%;padding:12px;border:2px solid #ddd;border-radius:10px;margin-bottom:10px}
-button{background:#2b6cb0;color:white;border:none;padding:12px 25px;border-radius:10px;cursor:pointer}
+select, input{width:90%;padding:12px;border:2px solid #ddd;border-radius:10px;margin-bottom:10px;font-size:16px}
+button{background:#2b6cb0;color:white;border:none;padding:12px 25px;border-radius:10px;cursor:pointer;font-size:16px}
 #answer{margin-top:20px;text-align:left;background:#f9fafb;padding:15px;border-radius:10px;white-space:pre-wrap}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <div class="box">
 <h1>Ammaryasin<br>Study AI Tutor</h1>
-<p>Assalam o Alaikum! Koi bhi sawal poocho, me step by step samjhaunga.</p>
-<input type="text" id="question" placeholder="Yahan apna sawal likho...">
-<br>
-<button onclick="askAI()">Send</button>
+
+<!-- Step 1: Language -->
+<div id="step1">
+  <p>1. Language Select Karein</p>
+  <select id="language">
+    <option value="">-- Select --</option>
+    <option value="Urdu">Urdu</option>
+    <option value="English">English</option>
+  </select>
+  <br><button onclick="nextStep(2)">Next</button>
+</div>
+
+<!-- Step 2: Book -->
+<div id="step2" class="hidden">
+  <p>2. Book Select Karein</p>
+  <select id="book">
+    <option value="">-- Select --</option>
+    <option value="Class 9 Math">Class 9 Math</option>
+    <option value="Class 10 Physics">Class 10 Physics</option>
+    <option value="Class 9 Chemistry">Class 9 Chemistry</option>
+    <option value="General">General Sawal</option>
+  </select>
+  <br><button onclick="nextStep(3)">Next</button>
+</div>
+
+<!-- Step 3: Question -->
+<div id="step3" class="hidden">
+  <p>3. Apna Sawal Likhein</p>
+  <input type="text" id="question" placeholder="Maslan: Pythagoras ka theorem kya hai?">
+  <br><button onclick="askAI()">Answer Lein</button>
+</div>
+
 <div id="answer"></div>
 </div>
 
 <script>
-const API_KEY = ""; // Yahan khali rahega
+let lang = "", book = "";
+
+function nextStep(step) {
+  if(step==2 && document.getElementById("language").value=="") return alert("Pehle language select karein");
+  if(step==3 && document.getElementById("book").value=="") return alert("Pehle book select karein");
+  
+  if(step==2) lang = document.getElementById("language").value;
+  if(step==3) book = document.getElementById("book").value;
+  
+  document.getElementById("step"+(step-1)).classList.add("hidden");
+  document.getElementById("step"+step).classList.remove("hidden");
+}
 
 async function askAI() {
   const question = document.getElementById("question").value;
   const answerBox = document.getElementById("answer");
-  if(!question) return;
+  if(!question) return alert("Sawal likhein");
   
   answerBox.innerHTML = "Socha raha hun... 🤔";
   
+  const fullPrompt = `You are a teacher. Answer in ${lang}. 
+  Context: Student is studying ${book}. 
+  Explain step by step in simple words: ${question}`;
+
   try {
     const res = await fetch("/.netlify/functions/groq", {
       method: "POST",
-      body: JSON.stringify({ question })
+      body: JSON.stringify({ question: fullPrompt })
     });
     const data = await res.json();
     answerBox.innerHTML = data.answer;

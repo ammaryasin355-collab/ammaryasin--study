@@ -1,40 +1,74 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Ammar AI Tutor</title>
+  <title>Ammar AI Tutor 📚</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 50px; background: #f0f0f0; }
-    h1 { color: #2c3e50; }
-    #box { width: 300px; padding: 10px; font-size: 16px; border: 2px solid #4CAF50; border-radius: 5px; }
-    #btn { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    #btn:hover { background: #45a049; }
-    #answer { margin-top: 20px; font-size: 18px; background: white; padding: 15px; border-radius: 8px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    body { font-family: Arial; text-align: center; padding: 20px; background: #f0f8ff; }
+    img { border-radius: 50%; margin-bottom: 10px; }
+    select, input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background: #4CAF50; color: white; cursor: pointer; }
+    button:hover { background: #45a049; }
+    #answer { margin-top: 20px; padding: 15px; background: white; border-radius: 10px; text-align: left; }
+    #history { margin-top: 30px; text-align: left; background: #fff3cd; padding: 10px; border-radius: 10px; }
   </style>
 </head>
-<body> 
-    <img src="logo.jpeg" alt="Ammar AI Tutor Logo" width="120">
-<h1>Ammar AI Tutor 📚</h1>
-  
-  <input type="text" id="box" placeholder="Sawal likho...">
+<body>
+  <img src="logo.jpeg" alt="Ammar AI Tutor Logo" width="120">
+  <h1>Ammar AI Tutor 📚</h1>
+
+  <label>Class Select karein: </label>
+  <select id="class">
+    <option>3rd Class</option>
+    <option>4th Class</option>
+    <option>5th Class</option>
+    <option>6th Class</option>
+    <option>7th Class</option>
+    <option>8th Class</option>
+    <option>9th Class</option>
+    <option>10th Class</option>
+    <option>1st Year</option>
+    <option>2nd Year</option>
+    <option>B.Com</option>
+  </select>
+  <br>
+
+  <label>Book: </label>
+  <input type="text" id="book" placeholder="Jaise: Math, Science, English">
+  <br>
+
+  <input type="text" id="box" placeholder="Apna sawal likho...">
   <button id="btn" onclick="ask()">Answer Lein</button>
-  <div id="answer">Ji, main hazir hun!</div>
+  
+  <div id="answer">Ji Sir, Class aur Book select karke sawal poochein!</div>
 
-  <script>
-    async function ask() {
-      const question = document.getElementById('box').value;
-      if(question.trim() === "") return;
-      document.getElementById('answer').innerText = "Ji, soch raha hun...";
+  <div id="history"><b>📖 History:</b></div>
 
-      const response = await fetch('/.netlify/functions/groq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: question })
-      });
+<script>
+let history = JSON.parse(localStorage.getItem("ammar_history")) || [];
 
-      const data = await response.json();
-      document.getElementById('answer').innerText = data.answer;
-    }
-  </script>
-</body>
-</html>
+function ask() {
+  let cls = document.getElementById("class").value;
+  let book = document.getElementById("book").value;
+  let q = document.getElementById("box").value;
+  
+  if(q.trim() === "" || book.trim() === "") {
+    document.getElementById("answer").innerText = "Ji Sir, pehle Class, Book aur Sawal likh dein.";
+    return;
+  }
+
+  let fullQuestion = `Class: ${cls} | Book: ${book} | Sawal: ${q}`;
+  document.getElementById("answer").innerText = "Ji Sir, ${cls} ki ${book} se jawab: " + q + " ka jawab AI dega...";
+
+  // History me save
+  history.push(fullQuestion);
+  localStorage.setItem("ammar_history", JSON.stringify(history));
+  showHistory();
+  
+  document.getElementById("box").value = ""; // box clear
+}
+
+function showHistory() {
+  let hDiv = document.getElementById("history");
+  hDiv.innerHTML = "<b>📖 History:</b><br>";
+  history.forEach((item, i) => {
+    hDiv.innerHTML += (

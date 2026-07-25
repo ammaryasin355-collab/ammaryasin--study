@@ -2,31 +2,34 @@
 <html lang="ur">
 <head>
   <meta charset="UTF-8">
-  <title>AI Tutor</title>
+  <title>Ammar AI Tutor</title>
   <style>
     body { font-family: Arial; text-align: center; padding: 50px; background: #f0f0f0; }
-    #box { width: 300px; padding: 10px; font-size: 16px; }
-    #btn { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-    #answer { margin-top: 20px; font-size: 18px; }
+    h1 { color: #2c3e50; }
+    #box { width: 300px; padding: 10px; font-size: 16px; border: 2px solid #4CAF50; border-radius: 5px; }
+    #btn { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    #btn:hover { background: #45a049; }
+    #answer { margin-top: 20px; font-size: 18px; background: white; padding: 15px; border-radius: 8px; max-width: 500px; margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body>
-  <h1>AI Tutor - Om ka Study Bot</h1>
+  <h1>Ammar AI Tutor 📚</h1>
   <input type="text" id="box" placeholder="Sawal likho...">
   <button id="btn" onclick="ask()">Answer Lein</button>
-  <div id="answer"></div>
+  <div id="answer">Ji, main hazir hun!</div>
 
   <script>
     async function ask() {
       const question = document.getElementById('box').value;
-      document.getElementById('answer').innerText = "Soch raha hun...";
-      
+      if(question.trim() === "") return;
+      document.getElementById('answer').innerText = "Ji, soch raha hun...";
+
       const response = await fetch('/.netlify/functions/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: question })
       });
-      
+
       const data = await response.json();
       document.getElementById('answer').innerText = data.answer;
     }
